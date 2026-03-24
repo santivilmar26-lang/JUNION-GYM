@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gym Junion — San Francisco del Rincón, Gto.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Nunito:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ================================================
+       DESIGN TOKENS
+    ================================================ */
+    :root {
+      --red:        #d4001a;
+      --red-bright: #ff1a35;
+      --red-soft:   rgba(212,0,26,.12);
+      --red-glow:   rgba(212,0,26,.30);
+      --black:      #080808;
+      --black-2:    #0f0f0f;
+      --black-3:    #181818;
+      --black-4:    #222;
+      --white:      #f2f2f2;
+      --muted:      #888;
+      --muted-2:    #b0b0b0;
+      --display:    'Oswald', sans-serif;
+      --body:       'Nunito', sans-serif;
+      --radius:     4px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--body);
+      overflow-x: hidden;
+    }
+
+    img { display: block; width: 100%; object-fit: cover; }
+    a   { text-decoration: none; color: inherit; }
+
+    /* ================================================
+       UTILITIES
+    ================================================ */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--body);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: var(--red-bright);
+      margin-bottom: 14px;
+    }
+    .tag::before {
+      content: '';
+      width: 28px; height: 2px;
+      background: var(--red-bright);
+      border-radius: 2px;
+    }
+
+    h2.display {
+      font-family: var(--display);
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.05;
+      color: var(--white);
+    }
+    h2.display span { color: var(--red-bright); }
+
+    .section-intro {
+      font-size: clamp(.95rem, 1.6vw, 1.08rem);
+      font-weight: 400;
+      color: var(--muted-2);
+      line-height: 1.8;
+      max-width: 520px;
+      margin-top: 14px;
+    }
+
+    section { padding: 96px 6%; }
+
+    /* reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(34px);
+      transition: opacity .75s ease, transform .75s ease;
+    }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ================================================
+       NAV
+    ================================================ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 6%;
+      transition: background .35s, padding .35s, box-shadow .35s;
+    }
+    nav.scrolled {
+      background: rgba(8,8,8,.97);
+      padding: 14px 6%;
+      box-shadow: 0 2px 30px rgba(0,0,0,.7);
+    }
+
+    .logo {
+      font-family: var(--display);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+    .logo span { color: var(--red-bright); }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .nav-links a {
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted-2);
+      transition: color .2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 0;
+      width: 0; height: 2px;
+      background: var(--red-bright);
+      transition: width .3s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-wa {
+      background: var(--red);
+      color: var(--white) !important;
+      padding: 9px 20px;
+      border-radius: var(--radius);
+      font-weight: 700 !important;
+      transition: background .2s, transform .2s, box-shadow .2s !important;
+    }
+    .nav-wa:hover {
+      background: var(--red-bright) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px var(--red-glow);
+    }
+    .nav-wa::after { display: none !important; }
+
+    .burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+    .burger span {
+      width: 24px; height: 2px;
+      background: var(--white);
+      border-radius: 2px;
+      transition: .3s;
+    }
+    .burger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    /* ================================================
+       HERO
+    ================================================ */
+    #hero {
+      position: relative;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1800&q=85');
+      background-size: cover;
+      background-position: center 25%;
+      filter: brightness(.28);
+      transform: scale(1.08);
+      animation: zoomBg 18s ease-in-out infinite alternate;
+    }
+    @keyframes zoomBg {
+      from { transform: scale(1.08); }
+      to   { transform: scale(1.14) translateX(-1.5%); }
+    }
+
+    /* grain texture overlay */
+    .hero-grain {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: .4;
+    }
+
+    /* left red slice */
+    .hero-slice {
+      position: absolute;
+      top: 0; left: 0;
+      width: 5px;
+      height: 100%;
+      background: var(--red);
+      box-shadow: 0 0 40px 6px var(--red-glow);
+    }
+
+    /* bottom gradient */
+    .hero-fade {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 220px;
+      background: linear-gradient(to top, var(--black) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 120px 6% 80px;
+      max-width: 780px;
+    }
+
+    .hero-location {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(212,0,26,.15);
+      border: 1px solid rgba(212,0,26,.3);
+      color: #ff6070;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 7px 14px;
+      border-radius: 2px;
+      margin-bottom: 22px;
+      opacity: 0;
+      animation: fadeUp .7s .1s forwards;
+    }
+    .hero-location svg { width: 14px; height: 14px; fill: currentColor; }
+
+    .hero-h1 {
+      font-family: var(--display);
+      font-size: clamp(3rem, 8.5vw, 7.5rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: .97;
+      letter-spacing: 1px;
+      color: var(--white);
+      opacity: 0;
+      animation: fadeUp .85s .25s forwards;
+    }
+    .hero-h1 em {
+      display: block;
+      font-style: normal;
+      color: var(--red-bright);
+    }
+
+    .hero-sub {
+      margin-top: 22px;
+      font-size: clamp(1rem, 1.8vw, 1.15rem);
+      font-weight: 300;
+      color: rgba(242,242,242,.7);
+      line-height: 1.75;
+      max-width: 500px;
+      opacity: 0;
+      animation: fadeUp .85s .45s forwards;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 38px;
+      opacity: 0;
+      animation: fadeUp .85s .65s forwards;
+    }
+
+    .btn-wa {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #25D366;
+      color: white;
+      font-family: var(--body);
+      font-weight: 700;
+      font-size: .85rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 16px 34px;
+      border-radius: var(--radius);
+      transition: transform .25s, box-shadow .3s, background .25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-wa::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,.15);
+      transform: translateX(-110%) skewX(-15deg);
+      transition: transform .5s;
+    }
+    .btn-wa:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(37,211,102,.32); }
+    .btn-wa:hover::before { transform: translateX(120%) skewX(-15deg); }
+    .btn-wa svg { width: 20px; height: 20px; fill: white; flex-shrink: 0; }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--white);
+      font-family: var(--body);
+      font-weight: 700;
+      font-size: .85rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 15px 28px;
+      border: 1px solid rgba(242,242,242,.25);
+      border-radius: var(--radius);
+      transition: border-color .25s, background .25s, color .25s;
+    }
+    .btn-outline:hover {
+      border-color: var(--red-bright);
+      color: var(--red-bright);
+      background: rgba(212,0,26,.07);
+    }
+
+    /* hero bottom cards */
+    .hero-cards {
+      position: absolute;
+      bottom: 52px; right: 6%;
+      display: flex;
+      gap: 14px;
+      z-index: 2;
+      opacity: 0;
+      animation: fadeUp .85s .9s forwards;
+    }
+    .hero-card {
+      background: rgba(15,15,15,.82);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.08);
+      padding: 18px 22px;
+      text-align: center;
+      min-width: 110px;
+    }
+    .hero-card-num {
+      font-family: var(--display);
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--red-bright);
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+    .hero-card-lbl {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ================================================
+       MARQUEE STRIP
+    ================================================ */
+    .marquee-wrap {
+      background: var(--red);
+      overflow: hidden;
+      padding: 13px 0;
+    }
+    .marquee-track {
+      display: inline-flex;
+      animation: marquee 24s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-item {
+      font-family: var(--display);
+      font-size: .95rem;
+      font-weight: 400;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.85);
+      padding: 0 32px;
+    }
+    .marquee-dot { color: rgba(0,0,0,.35); }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ================================================
+       BENEFITS
+    ================================================ */
+    #beneficios {
+      background: var(--black-2);
+      position: relative;
+      overflow: hidden;
+    }
+    #beneficios::after {
+      content: '';
+      position: absolute;
+      top: -100px; right: -200px;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,0,26,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .benefits-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .benefits-img-stack {
+      position: relative;
+      height: 520px;
+    }
+    .benefits-img-main {
+      position: absolute;
+      top: 0; left: 0;
+      width: 82%; height: 85%;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+    .benefits-img-main img {
+      height: 100%;
+      transition: transform .6s ease;
+    }
+    .benefits-img-stack:hover .benefits-img-main img { transform: scale(1.04); }
+
+    .benefits-img-accent {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 52%; height: 44%;
+      overflow: hidden;
+      border-radius: 2px;
+      border: 4px solid var(--black-2);
+    }
+    .benefits-img-accent img { height: 100%; }
+
+    .benefits-badge {
+      position: absolute;
+      bottom: 44%; left: 78%;
+      transform: translate(-50%, 50%);
+      background: var(--red);
+      color: white;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1;
+      border: 4px solid var(--black-2);
+      z-index: 2;
+    }
+    .benefits-badge small {
+      font-family: var(--body);
+      font-size: .5rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      opacity: .85;
+    }
+
+    .benefits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      margin-top: 44px;
+    }
+    .benefit-item {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      padding: 22px 24px;
+      background: var(--black-3);
+      border: 1px solid rgba(255,255,255,.05);
+      border-left: 3px solid transparent;
+      transition: border-color .3s, transform .3s, box-shadow .3s;
+    }
+    .benefit-item:hover {
+      border-left-color: var(--red-bright);
+      transform: translateX(5px);
+      box-shadow: -6px 0 30px rgba(212,0,26,.1);
+    }
+    .benefit-ico {
+      width: 46px; height: 46px;
+      background: var(--red-soft);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+      transition: background .3s;
+    }
+    .benefit-item:hover .benefit-ico { background: rgba(212,0,26,.22); }
+    .benefit-text h3 {
+      font-family: var(--display);
+      font-size: 1.15rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 5px;
+    }
+    .benefit-text p {
+      font-size: .88rem;
+      font-weight: 400;
+      color: var(--muted-2);
+      line-height: 1.7;
+    }
+
+    /* ================================================
+       QUOTE DIVIDER
+    ================================================ */
+    .quote-divider {
+      background: var(--black-3);
+      padding: 64px 6%;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border-top: 1px solid rgba(255,255,255,.04);
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .quote-divider::before {
+      content: '"';
+      position: absolute;
+      top: -30px; left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--display);
+      font-size: 22rem;
+      color: rgba(212,0,26,.04);
+      line-height: 1;
+      pointer-events: none;
+    }
+    .quote-text {
+      position: relative;
+      font-family: var(--display);
+      font-size: clamp(1.6rem, 4.5vw, 3.6rem);
+      font-weight: 400;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--white);
+      line-height: 1.15;
+    }
+    .quote-text span { color: var(--red-bright); }
+    .quote-by {
+      margin-top: 16px;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ================================================
+       PRICING
+    ================================================ */
+    #precios {
+      background: var(--black);
+    }
+    .pricing-intro {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+    .pricing-note {
+      font-size: .85rem;
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 300px;
+    }
+    .pricing-note strong { color: var(--white); }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+      align-items: start;
+    }
+
+    .price-card {
+      background: var(--black-3);
+      border: 1px solid rgba(255,255,255,.07);
+      padding: 44px 36px;
+      position: relative;
+      overflow: hidden;
+      transition: transform .35s, box-shadow .35s, border-color .35s;
+      display: flex;
+      flex-direction: column;
+    }
+    .price-card:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 28px 70px rgba(0,0,0,.6);
+    }
+    .price-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: rgba(255,255,255,.06);
+      transition: background .35s;
+    }
+    .price-card.hot {
+      background: linear-gradient(155deg, #140107 0%, var(--black-3) 55%);
+      border-color: rgba(212,0,26,.38);
+    }
+    .price-card.hot::after { background: var(--red); box-shadow: 0 0 18px var(--red-glow); }
+    .price-card.hot:hover { border-color: rgba(255,26,53,.6); box-shadow: 0 28px 70px rgba(212,0,26,.18); }
+
+    .hot-tag {
+      position: absolute;
+      top: 18px; right: -30px;
+      background: var(--red);
+      color: white;
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 5px 44px;
+      transform: rotate(42deg);
+    }
+
+    .plan-name {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .price-card.hot .plan-name { color: var(--red-bright); }
+
+    .price-big {
+      font-family: var(--display);
+      font-size: clamp(3rem, 6vw, 4.2rem);
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+    .price-big sup {
+      font-size: 1.3rem;
+      font-family: var(--body);
+      font-weight: 300;
+      color: var(--muted);
+      vertical-align: super;
+    }
+    .price-period {
+      font-size: .82rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 4px;
+      margin-bottom: 10px;
+      letter-spacing: .5px;
+    }
+    .price-pill {
+      display: inline-block;
+      background: rgba(37,211,102,.1);
+      border: 1px solid rgba(37,211,102,.2);
+      color: #3ddb7a;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+    .price-card.hot .price-pill {
+      background: rgba(212,0,26,.1);
+      border-color: rgba(212,0,26,.25);
+      color: #ff6070;
+    }
+
+    .price-feats {
+      list-style: none;
+      flex: 1;
+      margin-bottom: 32px;
+    }
+    .price-feats li {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: .88rem;
+      font-weight: 400;
+      color: rgba(242,242,242,.75);
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .price-feats li:last-child { border: none; }
+    .price-feats li::before {
+      content: '✓';
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--red-bright);
+      background: var(--red-soft);
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .price-feats li.off { color: rgba(242,242,242,.28); }
+    .price-feats li.off::before {
+      content: '–';
+      color: rgba(255,255,255,.2);
+      background: rgba(255,255,255,.04);
+    }
+
+    .btn-plan {
+      display: block;
+      text-align: center;
+      padding: 15px;
+      font-family: var(--body);
+      font-weight: 700;
+      font-size: .82rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-radius: var(--radius);
+      transition: transform .2s, box-shadow .3s, background .2s;
+    }
+    .btn-plan-outline {
+      border: 1px solid rgba(255,255,255,.18);
+      color: var(--white);
+    }
+    .btn-plan-outline:hover {
+      border-color: var(--red-bright);
+      color: var(--red-bright);
+      background: rgba(212,0,26,.06);
+    }
+    .btn-plan-solid {
+      background: var(--red);
+      color: white;
+      border: 1px solid transparent;
+    }
+    .btn-plan-solid:hover {
+      background: var(--red-bright);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 32px var(--red-glow);
+    }
+
+    /* ================================================
+       TRAINERS
+    ================================================ */
+    #entrenadores {
+      background: var(--black-2);
+      overflow: hidden;
+    }
+
+    .trainers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 26px;
+      margin-top: 52px;
+    }
+
+    .trainer-card {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,.05);
+    }
+
+    .trainer-photo {
+      height: 420px;
+      position: relative;
+      overflow: hidden;
+    }
+    .trainer-photo img {
+      height: 100%;
+      transition: transform .65s ease, filter .45s ease;
+      filter: grayscale(.2) brightness(.8);
+    }
+    .trainer-card:hover .trainer-photo img {
+      transform: scale(1.07);
+      filter: grayscale(0) brightness(.7);
+    }
+    .trainer-photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,.3) 50%, transparent 100%);
+    }
+
+    .trainer-body {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 26px;
+      z-index: 2;
+    }
+    .trainer-spec {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red-bright);
+      margin-bottom: 5px;
+    }
+    .trainer-name {
+      font-family: var(--display);
+      font-size: 1.7rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+    .trainer-phrase {
+      font-size: .83rem;
+      font-weight: 300;
+      font-style: italic;
+      color: rgba(242,242,242,.65);
+      margin-top: 8px;
+      line-height: 1.6;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height .5s ease, opacity .45s ease;
+    }
+    .trainer-card:hover .trainer-phrase {
+      max-height: 70px;
+      opacity: 1;
+    }
+    .trainer-cert {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height .5s ease .08s, opacity .45s ease .08s;
+    }
+    .trainer-cert::before {
+      content: '★';
+      color: var(--red-bright);
+    }
+    .trainer-card:hover .trainer-cert { max-height: 30px; opacity: 1; }
+
+    /* ================================================
+       COMMUNITY
+    ================================================ */
+    #comunidad {
+      padding: 0;
+      position: relative;
+    }
+    .community-bg {
+      position: relative;
+      min-height: 560px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .community-bg-img {
+      position: absolute;
+      inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=1800&q=80');
+      background-size: cover;
+      background-position: center 40%;
+      filter: brightness(.2);
+    }
+    .community-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(8,8,8,.92) 0%, rgba(8,8,8,.55) 55%, rgba(8,8,8,.2) 100%);
+    }
+    .community-content {
+      position: relative;
+      z-index: 2;
+      padding: 96px 6%;
+      max-width: 680px;
+    }
+    .community-content h2 {
+      font-family: var(--display);
+      font-size: clamp(2.2rem, 5.5vw, 4.4rem);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.05;
+      color: var(--white);
+      margin-bottom: 22px;
+    }
+    .community-content h2 span { color: var(--red-bright); }
+    .community-content p {
+      font-size: 1.05rem;
+      font-weight: 300;
+      color: rgba(242,242,242,.72);
+      line-height: 1.8;
+      max-width: 480px;
+      margin-bottom: 36px;
+    }
+
+    .community-pillars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .pillar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15,15,15,.65);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.1);
+      padding: 10px 18px;
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted-2);
+      border-radius: var(--radius);
+      transition: border-color .25s, color .25s;
+    }
+    .pillar:hover { border-color: var(--red-bright); color: var(--white); }
+    .pillar span { color: var(--red-bright); font-size: 1rem; }
+
+    /* ================================================
+       TESTIMONIALS
+    ================================================ */
+    #testimonios {
+      background: var(--black-3);
+    }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+      margin-top: 52px;
+    }
+    .testi-card {
+      background: var(--black-2);
+      border: 1px solid rgba(255,255,255,.06);
+      padding: 32px 28px;
+      position: relative;
+      transition: transform .3s, box-shadow .3s;
+    }
+    .testi-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.5);
+    }
+    .testi-quote {
+      font-size: 2.5rem;
+      color: var(--red);
+      line-height: 1;
+      font-family: Georgia, serif;
+      margin-bottom: 16px;
+    }
+    .testi-text {
+      font-size: .92rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--muted-2);
+      line-height: 1.75;
+      margin-bottom: 24px;
+    }
+    .testi-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .testi-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 2px solid var(--red);
+    }
+    .testi-info-name {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: .5px;
+    }
+    .testi-info-tag {
+      font-size: .68rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .testi-stars { color: var(--red-bright); font-size: .85rem; margin-bottom: 4px; }
+
+    /* ================================================
+       CONTACT
+    ================================================ */
+    #contacto {
+      background: var(--black-2);
+      position: relative;
+      overflow: hidden;
+    }
+    #contacto::before {
+      content: 'JUNION';
+      position: absolute;
+      bottom: -40px; right: -40px;
+      font-family: var(--display);
+      font-size: clamp(8rem, 22vw, 20rem);
+      font-weight: 700;
+      color: rgba(255,255,255,.018);
+      pointer-events: none;
+      line-height: 1;
+      letter-spacing: 5px;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 64px;
+      align-items: start;
+      position: relative;
+      z-index: 2;
+    }
+    .contact-left h2 { margin-bottom: 14px; }
+    .contact-left .section-intro { margin-bottom: 40px; }
+
+    .contact-wa-big {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      background: #25D366;
+      color: white;
+      font-family: var(--body);
+      font-weight: 700;
+      font-size: .95rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 20px 40px;
+      border-radius: var(--radius);
+      transition: transform .25s, box-shadow .3s;
+      margin-bottom: 32px;
+    }
+    .contact-wa-big:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 46px rgba(37,211,102,.3);
+    }
+    .contact-wa-big svg { width: 24px; height: 24px; fill: white; flex-shrink: 0; }
+
+    .contact-details {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .contact-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .contact-row-ico {
+      width: 38px; height: 38px;
+      background: var(--red-soft);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .contact-row-body label {
+      display: block;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--red-bright);
+      margin-bottom: 3px;
+    }
+    .contact-row-body p {
+      font-size: .88rem;
+      font-weight: 400;
+      color: var(--muted-2);
+      line-height: 1.55;
+    }
+
+    /* map placeholder */
+    .contact-right {
+      position: relative;
+    }
+    .map-frame {
+      width: 100%;
+      height: 420px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.07);
+      filter: grayscale(.6) brightness(.75) contrast(1.1);
+      transition: filter .4s;
+    }
+    .map-frame:hover { filter: grayscale(.2) brightness(.85) contrast(1.05); }
+    .map-frame iframe {
+      width: 100%; height: 100%;
+      border: none;
+      display: block;
+    }
+    .map-pin-label {
+      position: absolute;
+      bottom: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--red);
+      color: white;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 7px 18px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    /* ================================================
+       FOOTER
+    ================================================ */
+    footer {
+      background: var(--black);
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 48px;
+      padding: 60px 6%;
+    }
+    .footer-brand-logo {
+      font-family: var(--display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .footer-brand-logo span { color: var(--red-bright); }
+    .footer-brand-desc {
+      font-size: .85rem;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 280px;
+      margin-bottom: 20px;
+    }
+    .footer-social {
+      display: flex;
+      gap: 10px;
+    }
+    .footer-social a {
+      width: 36px; height: 36px;
+      background: var(--black-3);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--muted);
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .footer-social a:hover {
+      border-color: var(--red);
+      color: var(--white);
+      background: var(--red-soft);
+    }
+    .footer-col h4 {
+      font-family: var(--display);
+      font-size: .85rem;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 18px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col ul li a {
+      font-size: .84rem;
+      font-weight: 400;
+      color: var(--muted);
+      transition: color .2s;
+    }
+    .footer-col ul li a:hover { color: var(--red-bright); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.05);
+      padding: 20px 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy {
+      font-size: .74rem;
+      font-weight: 300;
+      color: var(--muted);
+      letter-spacing: .5px;
+    }
+    .footer-love {
+      font-size: .74rem;
+      color: var(--muted);
+    }
+    .footer-love span { color: var(--red-bright); }
+
+    /* ================================================
+       FLOATING WA
+    ================================================ */
+    .float-wa {
+      position: fixed;
+      bottom: 26px; right: 26px;
+      z-index: 990;
+      width: 58px; height: 58px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 24px rgba(37,211,102,.4);
+      animation: waPulse 2.8s ease-in-out infinite;
+      transition: transform .25s, box-shadow .25s;
+    }
+    .float-wa:hover {
+      transform: scale(1.12) translateY(-2px);
+      box-shadow: 0 10px 36px rgba(37,211,102,.5);
+      animation: none;
+    }
+    .float-wa svg { width: 28px; height: 28px; fill: white; }
+    .float-wa-tooltip {
+      position: absolute;
+      right: 66px; top: 50%;
+      transform: translateY(-50%);
+      background: var(--black-3);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--white);
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      padding: 7px 12px;
+      border-radius: var(--radius);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+    .float-wa:hover .float-wa-tooltip { opacity: 1; }
+    @keyframes waPulse {
+      0%, 100% { box-shadow: 0 4px 24px rgba(37,211,102,.4), 0 0 0 0 rgba(37,211,102,.35); }
+      60%       { box-shadow: 0 4px 24px rgba(37,211,102,.4), 0 0 0 16px rgba(37,211,102,0); }
+    }
+
+    /* ================================================
+       RESPONSIVE
+    ================================================ */
+    @media (max-width: 960px) {
+      .benefits-layout { grid-template-columns: 1fr; }
+      .benefits-img-stack { height: 340px; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .nav-links { display: none; }
+      .burger { display: flex; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        inset: 0;
+        background: rgba(8,8,8,.98);
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        z-index: 850;
+      }
+      .nav-links.open a { font-size: .95rem; }
+      .hero-cards { display: none; }
+      .trainers-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .contact-wa-big { width: 100%; justify-content: center; }
+    }
+
+    @media (max-width: 520px) {
+      section { padding: 72px 5%; }
+      .hero-btns { flex-direction: column; }
+      .hero-btns a { justify-content: center; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================================================
+     NAV
+====================================================== -->
+<nav id="nav">
+  <a href="#" class="logo">GYM<span>JUNION</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#beneficios">Nosotros</a></li>
+    <li><a href="#precios">Precios</a></li>
+    <li><a href="#entrenadores">Entrenadores</a></li>
+    <li><a href="#comunidad">Comunidad</a></li>
+    <li><a href="https://wa.me/5214767000000?text=Hola%2C%20me%20interesa%20Gym%20Junion" target="_blank" class="nav-wa">WhatsApp</a></li>
+  </ul>
+  <div class="burger" id="burger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ======================================================
+     HERO
+====================================================== -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-slice"></div>
+  <div class="hero-fade"></div>
+
+  <div class="hero-content">
+    <div class="hero-location">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>
+      San Francisco del Rincón, Guanajuato
+    </div>
+    <h1 class="hero-h1">Empieza hoy<em>tu mejor versión</em></h1>
+    <p class="hero-sub">En Gym Junion te esperamos con las puertas abiertas. Aquí no importa de dónde vienes, importa a dónde quieres llegar. Entrena con nosotros en San Francisco del Rincón.</p>
+    <div class="hero-btns">
+      <a href="https://wa.me/5214767000000?text=Hola%2C%20me%20interesa%20inscribirme%20en%20Gym%20Junion%20San%20Francisco%20del%20Rinc%C3%B3n" target="_blank" class="btn-wa">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+        Contáctanos por WhatsApp
+      </a>
+      <a href="#precios" class="btn-outline">Ver planes →</a>
+    </div>
+  </div>
+
+  <div class="hero-cards">
+    <div class="hero-card">
+      <div class="hero-card-num">5+</div>
+      <div class="hero-card-lbl">Años en SFR</div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-num">800+</div>
+      <div class="hero-card-lbl">Miembros</div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-num">12</div>
+      <div class="hero-card-lbl">Entrenadores</div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     MARQUEE
+====================================================== -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">Fuerza <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Cardio <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Comunidad <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Resultados Reales <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Spinning <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Musculación <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Box <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Clases Grupales <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">San Francisco del Rincón <span class="marquee-dot">◆</span></span>
+    <!-- duplicate -->
+    <span class="marquee-item">Fuerza <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Cardio <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Comunidad <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Resultados Reales <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Spinning <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Musculación <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Box <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Clases Grupales <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">San Francisco del Rincón <span class="marquee-dot">◆</span></span>
+  </div>
+</div>
+
+<!-- ======================================================
+     BENEFITS
+====================================================== -->
+<section id="beneficios">
+  <div class="benefits-layout">
+
+    <!-- Image stack -->
+    <div class="benefits-img-stack reveal">
+      <div class="benefits-img-main">
+        <img src="https://images.unsplash.com/photo-1581009137042-c552e485697a?w=900&q=80" alt="Entrenamiento en Gym Junion" />
+      </div>
+      <div class="benefits-img-accent">
+        <img src="https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=500&q=80" alt="Equipo moderno" />
+      </div>
+      <div class="benefits-badge">5+<small>años</small></div>
+    </div>
+
+    <!-- Text side -->
+    <div>
+      <div class="reveal">
+        <div class="tag">Por qué Gym Junion</div>
+        <h2 class="display">Un gym que<br>te <span>apoya</span> de<br>verdad</h2>
+        <p class="section-intro">No somos un gym cualquiera. Somos parte de San Francisco del Rincón, y conocemos a nuestra gente. Aquí encontrarás más que pesas: encontrarás motivación, guía y una comunidad que te impulsa.</p>
+      </div>
+      <div class="benefits-list">
+        <div class="benefit-item reveal">
+          <div class="benefit-ico">🤝</div>
+          <div class="benefit-text">
+            <h3>Ambiente amigable y sin juicios</h3>
+            <p>Seas principiante o avanzado, aquí todos empezamos desde cero algún día. El ambiente es motivador, inclusivo y te va a encantar desde el primer día.</p>
+          </div>
+        </div>
+        <div class="benefit-item reveal" style="transition-delay:.1s">
+          <div class="benefit-ico">🎯</div>
+          <div class="benefit-text">
+            <h3>Entrenadores que te acompañan</h3>
+            <p>Nuestros entrenadores no solo te enseñan a ejercitarte: te escuchan, diseñan tu rutina y celebran contigo cada pequeño avance que logras.</p>
+          </div>
+        </div>
+        <div class="benefit-item reveal" style="transition-delay:.2s">
+          <div class="benefit-ico">⚙️</div>
+          <div class="benefit-text">
+            <h3>Equipo moderno y bien mantenido</h3>
+            <p>Contamos con máquinas de última generación, área de pesas libres, cardio, spinning y más. Todo limpio y listo para que entrenes a tope.</p>
+          </div>
+        </div>
+        <div class="benefit-item reveal" style="transition-delay:.3s">
+          <div class="benefit-ico">📈</div>
+          <div class="benefit-text">
+            <h3>Resultados reales, sin promesas vacías</h3>
+            <p>Cientos de personas en San Francisco del Rincón ya transformaron su cuerpo y su mentalidad con nosotros. Tú puedes ser el siguiente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     QUOTE DIVIDER
+====================================================== -->
+<div class="quote-divider reveal">
+  <p class="quote-text">"El único mal entrenamiento<br>es el que <span>no hiciste."</span></p>
+  <p class="quote-by">— Mentalidad Gym Junion</p>
+</div>
+
+<!-- ======================================================
+     PRICING
+====================================================== -->
+<section id="precios">
+  <div class="pricing-intro reveal">
+    <div>
+      <div class="tag">Planes y precios</div>
+      <h2 class="display">Precios <span>honestos,</span><br>sin sorpresas</h2>
+    </div>
+    <p class="pricing-note"><strong>Sin inscripción obligatoria.</strong><br>Sin contratos largos. Empieza cuando quieras y avanza a tu ritmo. Cualquier duda, escríbenos por WhatsApp.</p>
+  </div>
+
+  <div class="pricing-grid">
+
+    <!-- Mensual -->
+    <div class="price-card reveal">
+      <div class="plan-name">Plan Mensual</div>
+      <div class="price-big"><sup>$</sup>450</div>
+      <div class="price-period">al mes · renueva cuando quieras</div>
+      <div class="price-pill">Sin inscripción</div>
+      <ul class="price-feats">
+        <li>Acceso ilimitado al gimnasio</li>
+        <li>Área de pesas y cardio</li>
+        <li>Clases grupales incluidas</li>
+        <li>Vestidores y casilleros</li>
+        <li class="off">Sesiones con entrenador</li>
+        <li class="off">Plan nutricional</li>
+      </ul>
+      <a href="https://wa.me/5214767000000?text=Hola%2C%20quiero%20informes%20del%20plan%20mensual" target="_blank" class="btn-plan btn-plan-outline">Empezar hoy →</a>
+    </div>
+
+    <!-- Trimestral DESTACADO -->
+    <div class="price-card hot reveal" style="transition-delay:.12s">
+      <div class="hot-tag">Más popular</div>
+      <div class="plan-name">Plan Trimestral</div>
+      <div class="price-big"><sup>$</sup>1,100</div>
+      <div class="price-period">3 meses · ahorras $250</div>
+      <div class="price-pill">¡El preferido de nuestra comunidad!</div>
+      <ul class="price-feats">
+        <li>Acceso ilimitado al gimnasio</li>
+        <li>Todas las clases y disciplinas</li>
+        <li>2 sesiones con entrenador</li>
+        <li>Evaluación física inicial</li>
+        <li>Rutina personalizada</li>
+        <li class="off">Plan nutricional</li>
+      </ul>
+      <a href="https://wa.me/5214767000000?text=Hola%2C%20me%20interesa%20el%20plan%20trimestral" target="_blank" class="btn-plan btn-plan-solid">Lo quiero →</a>
+    </div>
+
+    <!-- Semestral -->
+    <div class="price-card reveal" style="transition-delay:.24s">
+      <div class="plan-name">Plan Semestral</div>
+      <div class="price-big"><sup>$</sup>1,900</div>
+      <div class="price-period">6 meses · máximo ahorro</div>
+      <div class="price-pill">Comprométete con tu cambio</div>
+      <ul class="price-feats">
+        <li>Acceso ilimitado 24/7</li>
+        <li>Todas las clases y disciplinas</li>
+        <li>5 sesiones con entrenador</li>
+        <li>Rutina + seguimiento mensual</li>
+        <li>Plan nutricional básico</li>
+        <li>Acceso a zona premium</li>
+      </ul>
+      <a href="https://wa.me/5214767000000?text=Hola%2C%20quiero%20informes%20del%20plan%20semestral" target="_blank" class="btn-plan btn-plan-outline">Empezar hoy →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ======================================================
+     TRAINERS
+====================================================== -->
+<section id="entrenadores">
+  <div class="reveal">
+    <div class="tag">Nuestro equipo</div>
+    <h2 class="display">Entrenadores que<br><span>se ponen</span> tus zapatos</h2>
+    <p class="section-intro">Todos pasamos por el proceso. Nuestros entrenadores lo saben mejor que nadie, y por eso entrenan contigo, no solo para ti.</p>
+  </div>
+
+  <div class="trainers-grid">
+
+    <div class="trainer-card reveal">
+      <div class="trainer-photo">
+        <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?w=700&q=80" alt="Miguel Torres" />
+      </div>
+      <div class="trainer-body">
+        <div class="trainer-spec">Fuerza & Musculación</div>
+        <div class="trainer-name">Miguel Torres</div>
+        <p class="trainer-phrase">"Mi trabajo no termina cuando sales del gym. Te doy herramientas para que cargues con ellas toda la vida."</p>
+        <div class="trainer-cert">Certificado NASM · 8 años de experiencia</div>
+      </div>
+    </div>
+
+    <div class="trainer-card reveal" style="transition-delay:.1s">
+      <div class="trainer-photo">
+        <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=700&q=80" alt="Valeria Reyes" />
+      </div>
+      <div class="trainer-body">
+        <div class="trainer-spec">Funcional & Pérdida de Peso</div>
+        <div class="trainer-name">Valeria Reyes</div>
+        <p class="trainer-phrase">"No te prometo resultados rápidos, te prometo que vamos a trabajar juntas para que los resultados se queden para siempre."</p>
+        <div class="trainer-cert">Lic. Ciencias del Deporte · UNAM</div>
+      </div>
+    </div>
+
+    <div class="trainer-card reveal" style="transition-delay:.2s">
+      <div class="trainer-photo">
+        <img src="https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=700&q=80" alt="Jesús Navarro" />
+      </div>
+      <div class="trainer-body">
+        <div class="trainer-spec">Cardio & Alto Rendimiento</div>
+        <div class="trainer-name">Jesús Navarro</div>
+        <p class="trainer-phrase">"Entreno contigo codo a codo. Cuando tú ganas, yo gano. Así de simple es mi filosofía."</p>
+        <div class="trainer-cert">Certificado ACE · CrossFit L1</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ======================================================
+     COMMUNITY
+====================================================== -->
+<section id="comunidad" style="padding:0;">
+  <div class="community-bg reveal">
+    <div class="community-bg-img"></div>
+    <div class="community-overlay"></div>
+    <div class="community-content">
+      <h2>Más que un gym,<br>somos una <span>comunidad.</span></h2>
+      <p>Cada persona que cruza nuestra puerta forma parte de algo más grande. Compartimos entrenamientos, logros, caídas y levantadas. En Gym Junion, nadie entrena solo.</p>
+      <div class="community-pillars">
+        <div class="pillar"><span>🔥</span> Motivación diaria</div>
+        <div class="pillar"><span>💪</span> Retos mensuales</div>
+        <div class="pillar"><span>👥</span> Grupo en WhatsApp</div>
+        <div class="pillar"><span>🏆</span> Torneos internos</div>
+        <div class="pillar"><span>🥗</span> Tips de nutrición</div>
+        <div class="pillar"><span>❤️</span> 100% local</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     TESTIMONIALS
+====================================================== -->
+<section id="testimonios">
+  <div class="reveal">
+    <div class="tag">Lo que dicen nuestros miembros</div>
+    <h2 class="display">Ellos ya <span>cambiaron</span><br>su historia</h2>
+  </div>
+
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"</div>
+      <p class="testi-text">Llevaba años queriendo empezar y siempre lo dejaba para después. Entré a Gym Junion sin saber nada y los entrenadores me guiaron desde el primer día. Llevo 6 meses y no paro.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt="Ana Pérez" />
+        </div>
+        <div>
+          <div class="testi-info-name">Ana Pérez</div>
+          <div class="testi-info-tag">Miembro desde 2023 · SFR</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi-card reveal" style="transition-delay:.1s">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"</div>
+      <p class="testi-text">Lo que más me gusta es el ambiente. Nunca me sentí juzgado. Los compañeros te animan y los entrenadores están encima de ti. Bajé 14 kilos en 4 meses.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt="Roberto Guzmán" />
+        </div>
+        <div>
+          <div class="testi-info-name">Roberto Guzmán</div>
+          <div class="testi-info-tag">Miembro desde 2022 · SFR</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi-card reveal" style="transition-delay:.2s">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"</div>
+      <p class="testi-text">Valeria es una crack. Me diseñó un plan para perder peso sin pasar hambre y con rutinas que puedo mantener. Ya no lo veo como sacrificio, lo veo como parte de mi día.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">
+          <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80" alt="Lucía Martínez" />
+        </div>
+        <div>
+          <div class="testi-info-name">Lucía Martínez</div>
+          <div class="testi-info-tag">Miembro desde 2024 · SFR</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     CONTACT
+====================================================== -->
+<section id="contacto">
+  <div class="contact-grid">
+
+    <div class="contact-left reveal">
+      <div class="tag">Contáctanos</div>
+      <h2 class="display">¿Tienes dudas?<br><span>Escríbenos,</span><br>sin compromiso.</h2>
+      <p class="section-intro">Estamos aquí para resolver todas tus preguntas. Escríbenos por WhatsApp y te contestamos en minutos. Sin presión, sin letras chicas.</p>
+      <a href="https://wa.me/5214767000000?text=Hola%20Gym%20Junion%2C%20me%20gustar%C3%ADa%20recibir%20informes%20para%20inscribirme" target="_blank" class="contact-wa-big">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+        Escribir a WhatsApp
+      </a>
+      <div class="contact-details">
+        <div class="contact-row">
+          <div class="contact-row-ico">📍</div>
+          <div class="contact-row-body">
+            <label>Dirección</label>
+            <p>Calle Independencia 45, Centro<br>San Francisco del Rincón, Guanajuato, México</p>
+          </div>
+        </div>
+        <div class="contact-row">
+          <div class="contact-row-ico">🕐</div>
+          <div class="contact-row-body">
+            <label>Horario</label>
+            <p>Lunes a Viernes: 5:30 am – 10:00 pm<br>Sábados: 7:00 am – 8:00 pm<br>Domingos: 8:00 am – 2:00 pm</p>
+          </div>
+        </div>
+        <div class="contact-row">
+          <div class="contact-row-ico">📞</div>
+          <div class="contact-row-body">
+            <label>Teléfono</label>
+            <p>(476) 700-0000</p>
+          </div>
+        </div>
+        <div class="contact-row">
+          <div class="contact-row-ico">📲</div>
+          <div class="contact-row-body">
+            <label>Redes sociales</label>
+            <p>@gymjunion.sfr en Instagram y Facebook</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-right reveal" style="transition-delay:.15s">
+      <div class="map-frame">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29911.60!2d-101.852!3d21.017!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842777b5b5b5b5b5%3A0x0!2sSan%20Francisco%20del%20Rinc%C3%B3n%2C%20Guanajuato!5e0!3m2!1ses!2smx!4v1234567890"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Ubicación Gym Junion">
+        </iframe>
+      </div>
+      <div class="map-pin-label">📍 Gym Junion — San Francisco del Rincón</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ======================================================
+     FOOTER
+====================================================== -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand-logo">GYM<span>JUNION</span></div>
+      <p class="footer-brand-desc">Transformando vidas en San Francisco del Rincón desde hace más de 5 años. Tu progreso es nuestra motivación.</p>
+      <div class="footer-social">
+        <a href="#" title="Instagram">IG</a>
+        <a href="#" title="Facebook">FB</a>
+        <a href="#" title="TikTok">TT</a>
+        <a href="#" title="YouTube">YT</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Explora</h4>
+      <ul>
+        <li><a href="#beneficios">Por qué nosotros</a></li>
+        <li><a href="#precios">Planes y precios</a></li>
+        <li><a href="#entrenadores">Nuestro equipo</a></li>
+        <li><a href="#comunidad">Comunidad</a></li>
+        <li><a href="#testimonios">Testimonios</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contacto</h4>
+      <ul>
+        <li><a href="https://wa.me/5214767000000" target="_blank">WhatsApp directo</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Facebook</a></li>
+        <li><a href="#">Cómo llegar</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2025 Gym Junion · San Francisco del Rincón, Gto. · Todos los derechos reservados.</p>
+    <p class="footer-love">Hecho con <span>❤️</span> en San Francisco del Rincón</p>
+  </div>
+</footer>
+
+<!-- ======================================================
+     FLOATING WHATSAPP
+====================================================== -->
+<a href="https://wa.me/5214767000000?text=Hola%20Gym%20Junion%2C%20quisiera%20informes%20para%20inscribirme" target="_blank" class="float-wa" title="Escríbenos">
+  <span class="float-wa-tooltip">¡Escríbenos ahora!</span>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+</a>
+
+<!-- ======================================================
+     JS
+====================================================== -->
+<script>
+  /* Nav scroll */
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  /* Mobile menu */
+  const burger = document.getElementById('burger');
+  const links  = document.getElementById('navLinks');
+  burger.addEventListener('click', () => {
+    burger.classList.toggle('open');
+    links.classList.toggle('open');
+  });
+  links.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      burger.classList.remove('open');
+      links.classList.remove('open');
+    });
+  });
+
+  /* Scroll reveal */
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
